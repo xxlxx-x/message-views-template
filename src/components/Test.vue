@@ -7,19 +7,19 @@
 </template>
 
 <script>
-import MessageWraper from "./message-wraper/MessageWrapers"
+import MessageWraper from "./message-wraper/MessageWrapers";
 
 export default {
-  name: 'test',
+  name: "test",
   components: {
-    "MessageWraper": MessageWraper
+    MessageWraper: MessageWraper
   },
-  data () {
+  data() {
     return {
-      name: 'world',
-    }
-  },
-}
+      name: "world1"
+    };
+  }
+};
 </script>
 
 <style scoped>

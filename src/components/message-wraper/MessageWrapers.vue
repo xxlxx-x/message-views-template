@@ -7,14 +7,14 @@
 
 <script>
 export default {
-  name: 'message-wraper',
+  name: "message-wraper",
 
-  data () {
+  data() {
     return {
-      name: 'world',
-    }
-  },
-}
+      name: "world"
+    };
+  }
+};
 </script>
 
 <style scoped>
