@@ -1,19 +1,14 @@
 <template>
   <div class="test">
-    <h1>Hello message-views-template!</h1>
-    <message-wraper></message-wraper>
+    <h1>messages wraper</h1>
     <input v-model="name" placeholder="Name" />
   </div>
 </template>
 
 <script>
-import MessageWraper from "./message-wraper/MessageWrapers"
-
 export default {
-  name: 'test',
-  components: {
-    "MessageWraper": MessageWraper
-  },
+  name: 'message-wraper',
+
   data () {
     return {
       name: 'world',
