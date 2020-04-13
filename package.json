@@ -24,12 +24,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zhiqiang@forensix.cn/message-views-template.git"
+    "url": "git+https://https://github.com/xxlxx-x/message-views-template.git"
   },
   "bugs": {
-    "url": "https://github.com/zhiqiang@forensix.cn/message-views-template/issues"
+    "url": "https://https://github.com/xxlxx-x/message-views-template/issues"
   },
-  "homepage": "https://github.com/zhiqiang@forensix.cn/message-views-template#readme",
+  "homepage": "https://https://github.com/xxlxx-x/message-views-template#readme",
   "devDependencies": {
     "babel-core": "^6.0.0",
     "babel-eslint": "^7.1.1",
