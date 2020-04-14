@@ -1,7 +1,6 @@
 <template>
   <div class="test">
     <h1>messages wraper</h1>
-    <input v-model="name" placeholder="Name" />
   </div>
 </template>
 
