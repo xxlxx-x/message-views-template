@@ -5,6 +5,14 @@ function resolve(dir) {
 }
 
 module.exports = {
+  devServer: {
+    proxy: {
+      "/": {
+        target: "http://127.0.0.1:7878",
+        changeOrigin: true
+      }
+    }
+  },
   pages: {
     index: "example/main.js"
   },

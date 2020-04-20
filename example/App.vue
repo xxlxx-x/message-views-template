@@ -1,10 +1,14 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">scroll to load</router-link> |
-      <router-link to="/infite">infite load</router-link>
+  <div id="app" class="v-application">
+    <div style="width: 100%;height: 100%">
+      <div id="nav">
+        <router-link to="/">scroll to load</router-link> |
+        <router-link to="/infinite">infite load</router-link>
+      </div>
+      <div>
+        <router-view />
+      </div>
     </div>
-    <router-view />
   </div>
 </template>
 

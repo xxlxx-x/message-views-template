@@ -1,20 +1,20 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Scroll2Load from "../views/Scroll2Load.vue";
+import Scroll2Load from "@/views/Scroll2Load.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    name: "scroll2load",
+    name: "scroll",
     component: Scroll2Load
   },
   {
     path: "/infinite",
     name: "infinite",
     component: () =>
-      import(/* webpackChunkName: "infinite" */ "../views/InfiniteLoad.vue")
+      import(/* webpackChunkName: "infinite" */ "@/views/InfiniteLoad.vue")
   }
 ];
 
