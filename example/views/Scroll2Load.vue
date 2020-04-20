@@ -23,7 +23,11 @@
     </div>
     <p>总数： {{ totalCount }}</p>
     <div id="scroll2load">
-      <messagebody :messages="messages" :adapter="messageAdapter"></messagebody>
+      <conversation
+        :messages="messages"
+        :adapter="messageAdapter"
+        @messageClick="onMessageClick"
+      ></conversation>
     </div>
   </div>
 </template>
@@ -31,18 +35,20 @@
 <script>
 import { api } from "@/api/api";
 import lodash from "lodash";
-import messagebody from "components/messagebody/messagebody.vue";
+import moment from "moment";
+import conversation from "components/messagebody/conversation.vue";
 
+const MEDIAPATH_SORTED = ["StaticPath", "ThumbPath", "RawPath", "Url"];
 export default {
   name: "Scroll2Load",
   components: {
-    messagebody
+    conversation
   },
   //http://127.0.0.1:7878/api/v1/data?cid=1&eid=1&pid=3000065&skip=0&limit=100&userid=1&datatype=immsginfo&category=buddymsg&keyword=Id%20%3C%3D%2084047&oncolumns=&desc=false&columns=&withTagIds=&deepsearch=false&treeType=application
   data() {
     return {
       currentPage: 1,
-      limit: 100,
+      limit: 10,
       totalCount: 0,
       messages: [],
       throttleFunc: null
@@ -79,13 +85,13 @@ export default {
             //火眼
             cid: 1,
             eid: 1,
-            pid: 3000065,
+            pid: 3000082,
             skip: (this.currentPage - 1) * this.limit,
             limit: this.limit,
             userid: 1,
             datatype: "immsginfo",
-            category: "buddymsg",
-            keyword: "Id < 84047",
+            category: "buddymsgobject",
+            keyword: "",
             oncolumns: "",
             desc: false,
             columns: "",
@@ -97,11 +103,6 @@ export default {
             resolve(data);
           });
       });
-    },
-    messageAdapter(message) {
-      return {
-        key: message.Id
-      };
     },
     loadMoreMessages(event) {
       const theElement = event.target;
@@ -121,6 +122,78 @@ export default {
           });
         }
       }
+    },
+    onMessageClick(message, event) {
+      console.log("event", message, event);
+    },
+    buildPreviewUrl(params) {
+      const { isStatic, filePath, cid, eid } = params;
+      const append = isStatic
+        ? `/res/${cid || 1}/${encodeURIComponent(filePath)}`
+        : `/file/content?cid=${cid || 1}&eid=${eid}&path=${encodeURIComponent(
+            filePath
+          )}`;
+      return `http://127.0.0.1:7878/api/v1${append}`;
+    },
+    makeAvatar(message) {
+      let url = message.PortraitUrl || message.AvatarUrl;
+      if (!url) {
+        url = require(`@/assets/avatar/avatar${Number.parseInt(
+          Math.random() * 12
+        )}.png`);
+      }
+      return url;
+    },
+    makeName(message) {
+      let name;
+      if (message.Name) {
+        name = message.Name;
+      } else {
+        name = `${message.SendNickName}(${message.SendUserId})`;
+      }
+      return name;
+    },
+    messageAdapter(message) {
+      let messageItem = {
+        IsSend: message.IsSend,
+        Time: moment(message.Time)
+          .utcOffset(0)
+          .format("YYYY-HH-MM HH:mm:ss"),
+        AvatarUrl: this.makeAvatar(message),
+        Name: this.makeName(message)
+      };
+      switch (message.MsgType) {
+        case "image":
+        case "voice":
+          console.log("message image", message);
+          for (const key of MEDIAPATH_SORTED) {
+            const path = message[key];
+            if (path && key !== "Url") {
+              const { Cid, Eid } = message;
+              messageItem.Url = this.buildPreviewUrl({
+                cid: Cid,
+                eid: Eid,
+                filePath: path,
+                isStatic: key === "StaticPath"
+              });
+              console.log("key", key, Cid, message, messageItem.Url);
+              break;
+            }
+            if (path && key === "Url") messageItem.Url = path;
+          }
+          console.log("image Urls", message.Url);
+          break;
+
+        default:
+          messageItem.Text = message.Content;
+          break;
+      }
+
+      return {
+        Key: message.Id,
+        MsgType: message.MsgType,
+        ...messageItem
+      };
     }
   },
   created() {

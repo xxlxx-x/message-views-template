@@ -1,39 +1,44 @@
 <template>
   <div id="message-body">
-    <div
-      v-for="(message, index) in parsedMessages"
-      :key="`${message.key}_${index}`"
-    >
-      {{ message.key }} {{ index }}
-    </div>
+    <template v-if="message.MsgType === 'text'">
+      <span>{{ message.Text }}</span>
+    </template>
+    <template v-if="message.MsgType === 'image'">
+      <div class="image"><img :src="message.Url" /></div>
+    </template>
+    <template v-if="message.MsgType === 'voice'">
+      <div class="voice">
+        <audio :src="message.Url" controls></audio>
+      </div>
+    </template>
+    <template v-if="message.MsgType === 'video'">
+      <div class="audio">
+        <video :src="message.Url" controls></video>
+      </div>
+    </template>
+    <!-- {{ message }} -->
   </div>
 </template>
 
 <script>
 export default {
-  name: "message-wraper",
+  name: "message-body",
 
   props: {
-    messages: {
-      type: Array,
-      default: () => []
-    },
-    adapter: {
-      type: Function,
-      default: null
-    }
-  },
-  computed: {
-    parsedMessages() {
-      return this.messages.map(message => {
-        if (this.adapter) {
-          return this.adapter(message);
-        }
-        return message;
-      });
+    message: {
+      type: Object,
+      default: () => {}
     }
   }
 };
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+#message-body {
+  .image {
+    img {
+      max-height: 100px;
+    }
+  }
+}
+</style>
