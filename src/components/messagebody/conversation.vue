@@ -26,10 +26,21 @@
           <div class="main-content">
             <div class="name-wrapper">
               <div class="name">
-                {{ item.Name }} ({{ item.Time }})
-                <span style="color:red">
-                  {{ item.MsgType }}---{{ item.OriginMsgType }}</span
-                >
+                <template v-if="item.IsSend === 1">
+                  {{ item.Name }} ({{ item.UserAccount }}) ({{ item.Time }})
+                  <!-- <span style="color:red">
+                    {{ item.MsgType }}---{{ item.OriginMsgType }}</span
+                  > -->
+                </template>
+                <template v-if="item.IsSend === 2">
+                  <!-- <span style="color:red">
+                    {{ item.MsgType }}---{{ item.OriginMsgType }}</span
+                  > -->
+                  ({{ item.Time }}) ({{ item.UserAccount }}) {{ item.Name }}
+                </template>
+                <template v-if="item.Delete">
+                  <img src="../images/deleted.png" class="delete-image" />
+                </template>
               </div>
             </div>
             <div
@@ -153,7 +164,9 @@ $tri-angle-width: 8px;
       &:hover {
         background-color: rgba(228, 228, 228, 0.5);
       }
-
+      &:hover .delete-image {
+        opacity: 0.2;
+      }
       .avatar {
         margin-top: 5px;
         width: 50px;
@@ -171,8 +184,14 @@ $tri-angle-width: 8px;
           display: flex;
 
           .name {
-            white-space: nowrap;
             font-size: 13px;
+            position: relative;
+            white-space: nowrap;
+            .delete-image {
+              position: absolute;
+              top: -10px;
+              z-index: 10;
+            }
           }
         }
 
@@ -245,6 +264,9 @@ $tri-angle-width: 8px;
             flex-direction: row;
 
             .name {
+              .delete-image {
+                right: 0;
+              }
               &:before {
                 display: inline-block;
                 content: attr(name);
@@ -298,6 +320,9 @@ $tri-angle-width: 8px;
             flex-direction: row-reverse;
 
             .name {
+              .delete-image {
+                left: 0;
+              }
               &:after {
                 display: inline-block;
                 content: attr(name);

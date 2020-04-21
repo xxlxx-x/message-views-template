@@ -106,6 +106,8 @@ export default {
 
 <style lang="scss" scoped>
 #message-body {
+  min-width: 30px;
+  min-height: 30px;
   .text {
     text-align: left;
   }
@@ -192,13 +194,15 @@ export default {
   .card {
     .card-main {
       display: flex;
+      width: 260px;
       .card-img {
         max-width: 50px;
         min-width: 50px;
         margin-right: 10px;
       }
       .card-desc {
-        max-width: 170px;
+        text-align: left;
+        width: calc(100% - 80px);
         margin-right: 20px;
         .card-title {
           font-size: 18px;
@@ -229,7 +233,12 @@ export default {
       max-height: 100px;
     }
   }
-
+  .audio {
+    video {
+      max-width: 300px;
+      max-height: 300px;
+    }
+  }
   .transferaccount {
     background-color: rgb(44, 168, 237);
     padding: 10px 10px;

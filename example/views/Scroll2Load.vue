@@ -117,13 +117,13 @@ export default {
             //火眼
             cid: 1,
             eid: 1,
-            pid: 26000120,
+            pid: 26000381,
             skip: (this.currentPage - 1) * this.limit,
             limit: this.limit,
             userid: 1,
             datatype: "immsginfo",
             category: "buddymsg",
-            keyword: 'MsgType == "card"',
+            keyword: 'Delete == "2"',
             oncolumns: "",
             desc: false,
             columns: "",
@@ -181,30 +181,26 @@ export default {
       }
       return url;
     },
-    makeName(message) {
-      let name;
-      if (message.Name) {
-        name = message.Name;
-      } else {
-        name = `${message.SendNickName}(${message.SendUserId})`;
-      }
-      return name;
-    },
     messageAdapter(message) {
+      const { Cid, Eid } = message;
+      let result = null;
+      let temp = jp(message.ComplexContent);
+
       let messageItem = {
         Key: message.Id,
-        MsgType: this.makeMsgType(message.MsgType),
-        OriginMsgType: message.MsgType,
+        Name: message.Name || message.SendNickName,
+        UserAccount: message.PhoneNumber || message.SendUserId,
+        AvatarUrl: this.makeAvatar(message),
         IsSend: message.IsSend,
+        OriginMsgType: message.MsgType,
+        MsgType: this.makeMsgType(message.MsgType),
+        Delete: message.Delete === 2,
         Time: moment(message.Time)
           .utcOffset(0)
           .format("YYYY-HH-MM HH:mm:ss"),
-        AvatarUrl: this.makeAvatar(message),
-        Name: this.makeName(message),
         Raw: message
       };
-      let result = null;
-      let temp = jp(message.ComplexContent);
+
       switch (message.MsgType) {
         case "image":
         case "voice":
@@ -212,7 +208,6 @@ export default {
           for (const key of MEDIAPATH_SORTED) {
             const path = message[key];
             if (path && key !== "Url") {
-              const { Cid, Eid } = message;
               messageItem.Url = this.buildPreviewUrl({
                 cid: Cid,
                 eid: Eid,
@@ -222,6 +217,24 @@ export default {
               break;
             }
             if (path && key === "Url") messageItem.Url = path;
+          }
+          // console.log("image/voice Urls", message.Url);
+          break;
+        case "video":
+          if (message.RawPath) {
+            messageItem.Url = this.buildPreviewUrl({
+              cid: Cid,
+              eid: Eid,
+              filePath: message.RawPath
+            });
+          } else if (message.Url) {
+            messageItem.Url = message.Url;
+          } else if (message.ThumbPath) {
+            messageItem.Url = this.buildPreviewUrl({
+              cid: Cid,
+              eid: Eid,
+              filePath: message.ThumbPath
+            });
           }
           // console.log("image/voice Urls", message.Url);
           break;
