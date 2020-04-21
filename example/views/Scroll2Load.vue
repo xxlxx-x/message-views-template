@@ -44,6 +44,7 @@ const PREPARED_MESSAGE_TYPE = [
   "image",
   "voice",
   "video",
+  "web",
   "redenvelope",
   "imagetext",
   "transferaccount",
@@ -57,6 +58,19 @@ const TRANSFORM_TYPE = {
   transferacount: "transfer",
   qqzone: "web"
 };
+
+export const jp = str => {
+  let obj = {};
+  if (str) {
+    try {
+      obj = JSON.parse(str);
+    } catch (err) {
+      console.log("json parse error", err);
+    }
+  }
+  return obj;
+};
+
 export default {
   name: "Scroll2Load",
   components: {
@@ -103,13 +117,13 @@ export default {
             //火眼
             cid: 1,
             eid: 1,
-            pid: 3000082,
+            pid: 26000020,
             skip: (this.currentPage - 1) * this.limit,
             limit: this.limit,
             userid: 1,
             datatype: "immsginfo",
-            category: "buddymsgobject",
-            keyword: "",
+            category: "buddymsg",
+            keyword: 'MsgType == "web"',
             oncolumns: "",
             desc: false,
             columns: "",
@@ -189,6 +203,8 @@ export default {
         Name: this.makeName(message),
         Raw: message
       };
+      let result = null;
+      let temp = jp(message.ComplexContent);
       switch (message.MsgType) {
         case "image":
         case "voice":
@@ -209,7 +225,27 @@ export default {
           }
           // console.log("image/voice Urls", message.Url);
           break;
-
+        case "map":
+          result = {
+            Title: temp.Title,
+            Summary: temp.Summary,
+            Longitude: temp.Longitude,
+            Latitude: temp.Latitude
+          };
+          Object.assign(messageItem, result);
+          break;
+        case "web":
+          result = {
+            Title: temp.Title,
+            PictureLocalPath: temp.PictureLocalPath,
+            PictureUrl: temp.PictureUrl,
+            Summary: temp.Summary,
+            FromAppIconUrl: temp.FromAppIconUrl,
+            FromAppName: temp.FromAppName,
+            Url: temp.Url
+          };
+          Object.assign(messageItem, result);
+          break;
         default:
           messageItem.Text = message.Content;
           break;

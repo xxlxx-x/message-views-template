@@ -73,6 +73,7 @@ export default {
       });
     }
   },
+  // web map
   methods: {
     getMessageClasses(type) {
       return ["voice", "audio", "video", "pictrue"].includes(type)
@@ -240,6 +241,18 @@ $tri-angle-width: 8px;
             }
           }
 
+          .message-media {
+            flex-direction: row;
+            border-radius: 5px;
+            border-top-left-radius: 0px;
+
+            div {
+              &:after {
+                left: -5px;
+                top: 0;
+              }
+            }
+          }
           .message {
             flex-direction: row;
             border-radius: 5px;
