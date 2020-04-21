@@ -82,7 +82,7 @@ export default {
   methods: {
     getMessageClasses(type, IsSend) {
       if (["web", "map"].includes(type)) return "message-regular";
-      return ["voice", "audio", "video", "image"].includes(type)
+      return ["voice", "audio", "video", "image", "redenvelope"].includes(type)
         ? "message-media"
         : IsSend
         ? "message-normal"

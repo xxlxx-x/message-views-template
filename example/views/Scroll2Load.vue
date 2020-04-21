@@ -123,7 +123,8 @@ export default {
             userid: 1,
             datatype: "immsginfo",
             category: "buddymsg",
-            keyword: "",
+            keyword:
+              'MsgType == "redenvelope" OR MsgType == "transferaccount" OR MsgType == "transfer"',
             oncolumns: "",
             desc: false,
             columns: "",
@@ -243,6 +244,26 @@ export default {
             FromAppIconUrl: temp.FromAppIconUrl,
             FromAppName: temp.FromAppName,
             Url: temp.Url
+          };
+          Object.assign(messageItem, result);
+          break;
+        case "redenvelope":
+          result = {
+            Title: temp.Title,
+            ActionText: temp.ActionText,
+            ThumbUrl: temp.ThumbUrl,
+            Name: temp.Name,
+            Money: temp.Money
+          };
+          Object.assign(messageItem, result);
+          break;
+        case "transferaccount":
+          result = {
+            Title: temp.Title,
+            Summary: temp.Summary,
+            Url: temp.Url,
+            SumNotemary: temp.Note,
+            Name: temp.Name
           };
           Object.assign(messageItem, result);
           break;

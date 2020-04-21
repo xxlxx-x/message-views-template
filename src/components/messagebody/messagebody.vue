@@ -48,6 +48,26 @@
         </div>
       </div>
     </template>
+    <template v-if="message.MsgType === 'redenvelope'">
+      <div class="redenvelope">
+        <img class="redenvelope-img" src="../images/hb.svg" />
+        <div class="redenvelope-desc">
+          <div>{{ message.Title }}</div>
+          <div>{{ message.ActionText }}</div>
+          <div>{{ message.Money }}</div>
+        </div>
+      </div>
+    </template>
+    <template v-if="message.MsgType === 'transferaccount'">
+      <div class="transferaccount">
+        <img class="transferaccount-img" src="../images/zz.svg" />
+        <div class="transferaccount-desc">
+          <div>{{ message.Summary }}</div>
+          <div>{{ message.Title }}</div>
+          <div>{{ message.Name }}</div>
+        </div>
+      </div>
+    </template>
     <!-- {{ message }} -->
   </div>
 </template>
@@ -201,13 +221,8 @@ export default {
       max-width: 170px;
       width: 170px;
       color: #fff;
-
-      h5 {
-        margin-bottom: 5px;
-      }
-
-      h3 {
-        font-weight: 400;
+      div:nth-child(3) {
+        border-top: 1px solid rgba(255, 255, 255, 0.514);
       }
     }
   }
