@@ -123,7 +123,7 @@ export default {
             userid: 1,
             datatype: "immsginfo",
             category: "buddymsg",
-            keyword: 'MsgType == "web"',
+            keyword: "",
             oncolumns: "",
             desc: false,
             columns: "",

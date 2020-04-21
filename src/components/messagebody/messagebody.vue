@@ -29,9 +29,13 @@
       <div class="web">
         <div class="web1">
           <div class="web1-desc">
-            <a v-if="message.Url" :href="message.Url" class="web-title">{{
-              message.Title
-            }}</a>
+            <a
+              v-if="message.Url"
+              :href="message.Url"
+              class="web-title"
+              target="blank"
+              >{{ message.Title }}</a
+            >
             <span v-else class="web-title">{{ message.Title }}</span>
             <h5>{{ message.Summary }}</h5>
           </div>

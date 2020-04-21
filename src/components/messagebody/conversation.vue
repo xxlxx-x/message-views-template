@@ -32,7 +32,12 @@
                 >
               </div>
             </div>
-            <div :class="getMessageClasses(item.MsgType)">
+            <div
+              :class="[
+                'message',
+                getMessageClasses(item.MsgType, item.IsSend === 2)
+              ]"
+            >
               <message-body
                 :message="item"
                 @messageClick="messageClick"
@@ -73,12 +78,15 @@ export default {
       });
     }
   },
-  // web map
+  // media 媒体类型消息不显示背景
   methods: {
-    getMessageClasses(type) {
-      return ["voice", "audio", "video", "pictrue"].includes(type)
+    getMessageClasses(type, IsSend) {
+      if (["web", "map"].includes(type)) return "message-regular";
+      return ["voice", "audio", "video", "image"].includes(type)
         ? "message-media"
-        : "message";
+        : IsSend
+        ? "message-normal"
+        : "message-regular";
     },
     messageClick(message, event) {
       console.log("message", message, event);
@@ -161,33 +169,34 @@ $tri-angle-width: 8px;
           }
         }
 
-        .message-media {
-          font-size: 14px;
-          display: flex;
-          padding: 5px;
+        // 正常灰色
+        .message-regular {
+          flex-direction: row-reverse;
+          border-radius: 5px;
+          border-top-right-radius: 0px;
 
           div {
-            position: relative;
-            max-width: 100%;
-            padding: 5px;
-            display: inline-block;
-            word-wrap: break-word;
             background-color: rgb(235, 235, 235);
-            border-radius: 5px;
-
             &:after {
-              position: absolute;
-              display: block;
-              content: "";
-              width: 0;
-              height: 0;
-              border-left: $tri-angle-width solid transparent;
-              border-right: $tri-angle-width solid transparent;
               border-top: $tri-angle-width solid rgb(235, 235, 235);
+              right: -5px;
+              top: 0;
+            }
+          }
+        }
+        // 纯白背景
+        .message-media {
+          div {
+            background-color: rgb(255, 255, 255);
+            &:after {
+              border-top: $tri-angle-width solid rgb(255, 255, 255);
             }
           }
         }
         .message {
+          flex-direction: row-reverse;
+          border-radius: 5px;
+          border-top-right-radius: 0px;
           font-size: 14px;
           display: flex;
           padding: 5px;
@@ -198,7 +207,7 @@ $tri-angle-width: 8px;
             padding: 5px;
             display: inline-block;
             word-wrap: break-word;
-            background-color: rgb(235, 235, 235);
+            // background-color: rgb(235, 235, 235);
             border-radius: 5px;
 
             &:after {
@@ -207,9 +216,11 @@ $tri-angle-width: 8px;
               content: "";
               width: 0;
               height: 0;
+              right: -5px;
+              top: 0;
               border-left: $tri-angle-width solid transparent;
               border-right: $tri-angle-width solid transparent;
-              border-top: $tri-angle-width solid rgb(235, 235, 235);
+              // border-top: $tri-angle-width solid rgb(235, 235, 235);
             }
           }
         }
@@ -293,32 +304,31 @@ $tri-angle-width: 8px;
               }
             }
           }
+          // 正常灰色
+          .message-regular {
+            div {
+              background-color: rgb(235, 235, 235);
+              &:after {
+                border-top: $tri-angle-width solid rgb(235, 235, 235);
+              }
+            }
+          }
+          // 纯白背景
           .message-media {
-            flex-direction: row-reverse;
-            border-radius: 5px;
-            border-top-right-radius: 0px;
-
             div {
               background-color: rgb(255, 255, 255);
               &:after {
                 border-top: $tri-angle-width solid rgb(255, 255, 255);
-                right: -5px;
-                top: 0;
               }
             }
           }
-          .message {
-            flex-direction: row-reverse;
-            border-radius: 5px;
-            border-top-right-radius: 0px;
-
+          // 右边 蓝色背景
+          .message-normal {
             div {
               color: white;
               background-color: rgb(21, 139, 236);
               &:after {
                 border-top: $tri-angle-width solid rgb(21, 139, 236);
-                right: -5px;
-                top: 0;
               }
             }
           }
