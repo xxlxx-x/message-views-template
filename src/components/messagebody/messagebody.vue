@@ -1,5 +1,5 @@
 <template>
-  <div id="message-body">
+  <div id="message-body" @click="emitClick">
     <template v-if="message.MsgType === 'text'">
       <span>{{ message.Text }}</span>
     </template>
@@ -28,6 +28,11 @@ export default {
     message: {
       type: Object,
       default: () => {}
+    }
+  },
+  methods: {
+    emitClick(event) {
+      this.$emit("messageClick", this.message, event);
     }
   }
 };

@@ -5,9 +5,11 @@
       v-for="(item, index) in parsedMessages"
       :key="`${item.Key}_${index}`"
     >
-      <div class="time">{{ item.Time }}</div>
-      <div class="main-system" v-if="item.MsgType === 'systemmsg'">
-        <span>{{ item.Content }}</span>
+      <div class="time">
+        <span>{{ item.Time }}</span>
+      </div>
+      <div class="main-systemmsg" v-if="item.MsgType === 'systemmsg'">
+        <span>{{ item.Text }}</span>
       </div>
       <template v-else>
         <div
@@ -16,16 +18,25 @@
             { left: item.IsSend === 1, right: item.IsSend === 2 }
           ]"
         >
-          <img class="avatar" :src="item.AvatarUrl" />
+          <img
+            class="avatar"
+            :src="item.AvatarUrl"
+            @click="event => messageClick(item, event)"
+          />
           <div class="main-content">
             <div class="name-wrapper">
               <div class="name">
                 {{ item.Name }} ({{ item.Time }})
-                <span style="color:red">{{ item.MsgType }}</span>
+                <span style="color:red">
+                  {{ item.MsgType }}---{{ item.OriginMsgType }}</span
+                >
               </div>
             </div>
-            <div class="message">
-              <message-body :message="item"></message-body>
+            <div :class="getMessageClasses(item.MsgType)">
+              <message-body
+                :message="item"
+                @messageClick="messageClick"
+              ></message-body>
             </div>
           </div>
         </div>
@@ -61,6 +72,16 @@ export default {
         return message;
       });
     }
+  },
+  methods: {
+    getMessageClasses(type) {
+      return ["voice", "audio", "video", "pictrue"].includes(type)
+        ? "message-media"
+        : "message";
+    },
+    messageClick(message, event) {
+      console.log("message", message, event);
+    }
   }
 };
 </script>
@@ -70,7 +91,7 @@ $tri-angle-width: 8px;
 
 #conversation-wraper {
   padding: 10px 0;
-  background-color: rgb(250, 250, 250);
+  background-color: rgb(255, 255, 255);
 
   .item {
     min-height: 60px;
@@ -101,10 +122,10 @@ $tri-angle-width: 8px;
       justify-content: center;
 
       span {
-        font-size: 12px;
+        font-size: 13px;
         border-radius: 4px;
         padding: 0 10px;
-        background-color: pink;
+        background-color: rgb(202, 202, 202);
         color: #fff;
       }
     }
@@ -114,7 +135,7 @@ $tri-angle-width: 8px;
       padding: 5px 20px;
 
       &:hover {
-        background-color: rgba(0, 0, 0, 0.1);
+        background-color: rgba(228, 228, 228, 0.5);
       }
 
       .avatar {
@@ -139,6 +160,32 @@ $tri-angle-width: 8px;
           }
         }
 
+        .message-media {
+          font-size: 14px;
+          display: flex;
+          padding: 5px;
+
+          div {
+            position: relative;
+            max-width: 100%;
+            padding: 5px;
+            display: inline-block;
+            word-wrap: break-word;
+            background-color: rgb(235, 235, 235);
+            border-radius: 5px;
+
+            &:after {
+              position: absolute;
+              display: block;
+              content: "";
+              width: 0;
+              height: 0;
+              border-left: $tri-angle-width solid transparent;
+              border-right: $tri-angle-width solid transparent;
+              border-top: $tri-angle-width solid rgb(235, 235, 235);
+            }
+          }
+        }
         .message {
           font-size: 14px;
           display: flex;
@@ -150,7 +197,7 @@ $tri-angle-width: 8px;
             padding: 5px;
             display: inline-block;
             word-wrap: break-word;
-            background-color: #fff;
+            background-color: rgb(235, 235, 235);
             border-radius: 5px;
 
             &:after {
@@ -161,7 +208,7 @@ $tri-angle-width: 8px;
               height: 0;
               border-left: $tri-angle-width solid transparent;
               border-right: $tri-angle-width solid transparent;
-              border-top: $tri-angle-width solid #fff;
+              border-top: $tri-angle-width solid rgb(235, 235, 235);
             }
           }
         }
@@ -233,14 +280,30 @@ $tri-angle-width: 8px;
               }
             }
           }
+          .message-media {
+            flex-direction: row-reverse;
+            border-radius: 5px;
+            border-top-right-radius: 0px;
 
+            div {
+              background-color: rgb(255, 255, 255);
+              &:after {
+                border-top: $tri-angle-width solid rgb(255, 255, 255);
+                right: -5px;
+                top: 0;
+              }
+            }
+          }
           .message {
             flex-direction: row-reverse;
             border-radius: 5px;
             border-top-right-radius: 0px;
 
             div {
+              color: white;
+              background-color: rgb(21, 139, 236);
               &:after {
+                border-top: $tri-angle-width solid rgb(21, 139, 236);
                 right: -5px;
                 top: 0;
               }

@@ -39,6 +39,24 @@ import moment from "moment";
 import conversation from "components/messagebody/conversation.vue";
 
 const MEDIAPATH_SORTED = ["StaticPath", "ThumbPath", "RawPath", "Url"];
+const PREPARED_MESSAGE_TYPE = [
+  "systemmsg",
+  "image",
+  "voice",
+  "video",
+  "redenvelope",
+  "imagetext",
+  "transferaccount",
+  "map",
+  "card",
+  "file",
+  "multi"
+];
+const TRANSFORM_TYPE = {
+  voice: "audio",
+  transferacount: "transfer",
+  qqzone: "web"
+};
 export default {
   name: "Scroll2Load",
   components: {
@@ -135,6 +153,11 @@ export default {
           )}`;
       return `http://127.0.0.1:7878/api/v1${append}`;
     },
+    makeMsgType(type) {
+      return TRANSFORM_TYPE[type] || PREPARED_MESSAGE_TYPE.includes(type)
+        ? type
+        : "text";
+    },
     makeAvatar(message) {
       let url = message.PortraitUrl || message.AvatarUrl;
       if (!url) {
@@ -155,17 +178,21 @@ export default {
     },
     messageAdapter(message) {
       let messageItem = {
+        Key: message.Id,
+        MsgType: this.makeMsgType(message.MsgType),
+        OriginMsgType: message.MsgType,
         IsSend: message.IsSend,
         Time: moment(message.Time)
           .utcOffset(0)
           .format("YYYY-HH-MM HH:mm:ss"),
         AvatarUrl: this.makeAvatar(message),
-        Name: this.makeName(message)
+        Name: this.makeName(message),
+        Raw: message
       };
       switch (message.MsgType) {
         case "image":
         case "voice":
-          console.log("message image", message);
+          message.Url = "unknow";
           for (const key of MEDIAPATH_SORTED) {
             const path = message[key];
             if (path && key !== "Url") {
@@ -176,12 +203,11 @@ export default {
                 filePath: path,
                 isStatic: key === "StaticPath"
               });
-              console.log("key", key, Cid, message, messageItem.Url);
               break;
             }
             if (path && key === "Url") messageItem.Url = path;
           }
-          console.log("image Urls", message.Url);
+          // console.log("image/voice Urls", message.Url);
           break;
 
         default:
@@ -189,11 +215,7 @@ export default {
           break;
       }
 
-      return {
-        Key: message.Id,
-        MsgType: message.MsgType,
-        ...messageItem
-      };
+      return messageItem;
     }
   },
   created() {
