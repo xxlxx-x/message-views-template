@@ -117,14 +117,13 @@ export default {
             //火眼
             cid: 1,
             eid: 1,
-            pid: 26000020,
+            pid: 26000120,
             skip: (this.currentPage - 1) * this.limit,
             limit: this.limit,
             userid: 1,
             datatype: "immsginfo",
             category: "buddymsg",
-            keyword:
-              'MsgType == "redenvelope" OR MsgType == "transferaccount" OR MsgType == "transfer"',
+            keyword: 'MsgType == "card"',
             oncolumns: "",
             desc: false,
             columns: "",
@@ -232,6 +231,14 @@ export default {
             Summary: temp.Summary,
             Longitude: temp.Longitude,
             Latitude: temp.Latitude
+          };
+          Object.assign(messageItem, result);
+          break;
+        case "card":
+          result = {
+            Account: temp.Account,
+            Name: temp.Name,
+            Flag: temp.Flag
           };
           Object.assign(messageItem, result);
           break;

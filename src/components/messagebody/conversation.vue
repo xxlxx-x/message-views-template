@@ -81,8 +81,15 @@ export default {
   // media 媒体类型消息不显示背景
   methods: {
     getMessageClasses(type, IsSend) {
-      if (["web", "map"].includes(type)) return "message-regular";
-      return ["voice", "audio", "video", "image", "redenvelope"].includes(type)
+      if (["web", "map", "card"].includes(type)) return "message-regular";
+      return [
+        "voice",
+        "audio",
+        "video",
+        "image",
+        "redenvelope",
+        "transferaccount"
+      ].includes(type)
         ? "message-media"
         : IsSend
         ? "message-normal"

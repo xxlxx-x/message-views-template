@@ -19,10 +19,24 @@
     <template v-if="message.MsgType === 'map'">
       <div class="map">
         <img class="map-img" src="../images/map.png" />
-        <div>
-          <div class="map-desc">{{ message.Title }}</div>
-          <div class="map-desc">{{ message.Summary }}</div>
+        <div class="map-desc">
+          <div>{{ message.Title }}</div>
+          <div>{{ message.Summary }}</div>
         </div>
+      </div>
+    </template>
+    <template v-if="message.MsgType === 'card'">
+      <div class="card">
+        <div class="card-main">
+          <img class="card-img" src="../images/tx.svg" />
+          <div class="card-desc">
+            <div class="card-title">{{ message.Name }}</div>
+            <div class="card-info" :title="message.Account">
+              {{ message.Account }}
+            </div>
+          </div>
+        </div>
+        <div class="card-flag">{{ message.Flag }}</div>
       </div>
     </template>
     <template v-if="message.MsgType === 'web'">
@@ -176,27 +190,37 @@ export default {
   }
 
   .card {
-    display: flex;
-    padding-bottom: 20px;
-
-    .card-img {
-      max-width: 50px;
-      min-width: 50px;
-      margin-right: 10px;
+    .card-main {
+      display: flex;
+      .card-img {
+        max-width: 50px;
+        min-width: 50px;
+        margin-right: 10px;
+      }
+      .card-desc {
+        max-width: 170px;
+        margin-right: 20px;
+        .card-title {
+          font-size: 18px;
+          font-weight: 400;
+        }
+        .card-info {
+          font-size: 14px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: normal;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          display: -webkit-box;
+        }
+      }
     }
-
-    .card-desc {
-      // min-width: 150px;
-      margin-right: 20px;
-
-      h3 {
-        font-weight: 400;
-        margin-bottom: 10px;
-      }
-
-      h5 {
-        font-weight: 400;
-      }
+    .card-flag {
+      width: 100%;
+      margin-top: 5px;
+      padding-top: 5px;
+      text-align: left;
+      border-top: 1px solid rgba(218, 218, 218, 0.562);
     }
   }
 
