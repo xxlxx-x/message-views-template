@@ -1,5 +1,5 @@
 <template>
-  <div id="message-body" @click="emitClick">
+  <div class="message-body" @click="emitClick">
     <template v-if="message.MsgType === 'text'">
       <div class="text" v-html="message.Text"></div>
     </template>
@@ -105,7 +105,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#message-body {
+.message-body {
   min-width: 30px;
   min-height: 30px;
   .text {

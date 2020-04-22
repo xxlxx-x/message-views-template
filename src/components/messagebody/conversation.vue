@@ -67,6 +67,7 @@ import messagebody from "components/messagebody/messagebody";
 export default {
   name: "conversation-wraper",
   components: {
+    // eslint-disable-next-line vue/no-unused-components
     "message-body": messagebody
   },
   props: {

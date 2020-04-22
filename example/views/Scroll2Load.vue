@@ -23,21 +23,26 @@
     </div>
     <p>总数： {{ totalCount }}</p>
     <div id="scroll2load">
-      <conversation
+      <!-- <conversation
         :messages="messages"
         :adapter="messageAdapter"
         @messageClick="onMessageClick"
-      ></conversation>
+      ></conversation> -->
+
+      <collection :collections="messages" :adapter="collectAdater"></collection>
     </div>
   </div>
 </template>
 
 <script>
+/* eslint-disable vue/no-unused-components */
 import { api } from "@/api/api";
-import lodash from "lodash";
+import _ from "lodash";
 import moment from "moment";
+import collection from "components/messagebody/collection";
 import conversation from "components/messagebody/conversation.vue";
 
+const MEDIAPATH_KEYSMAP = ["StaticPaths[0]", "LocalPaths[0]", "Urls[0]"];
 const MEDIAPATH_SORTED = ["StaticPath", "ThumbPath", "RawPath", "Url"];
 const PREPARED_MESSAGE_TYPE = [
   "systemmsg",
@@ -74,7 +79,8 @@ export const jp = str => {
 export default {
   name: "Scroll2Load",
   components: {
-    conversation
+    conversation,
+    collection
   },
   //http://127.0.0.1:7878/api/v1/data?cid=1&eid=1&pid=3000065&skip=0&limit=100&userid=1&datatype=immsginfo&category=buddymsg&keyword=Id%20%3C%3D%2084047&oncolumns=&desc=false&columns=&withTagIds=&deepsearch=false&treeType=application
   data() {
@@ -98,32 +104,16 @@ export default {
       return new Promise((resolve, reject) => {
         api
           .getData({
-            // 取综
-            // cid: 285,
-            // eid: 1201,
-            // pid: 157000031,
-            // skip: 0,
-            // limit: 100,
-            // userid: 1,
-            // datatype: "immsginfo",
-            // category: "troopmsg",
-            // keyword: "",
-            // oncolumns: "",
-            // desc: false,
-            // columns: "",
-            // withTagIds: "",
-            // deepsearch: false,
-            // treeType: "application"
             //火眼
             cid: 1,
-            eid: 1,
-            pid: 26000381,
+            eid: 14,
+            pid: 358000549,
             skip: (this.currentPage - 1) * this.limit,
             limit: this.limit,
             userid: 1,
-            datatype: "immsginfo",
-            category: "buddymsg",
-            keyword: 'Delete == "2"',
+            datatype: "imfavinfo",
+            category: "favoritenode",
+            keyword: "",
             oncolumns: "",
             desc: false,
             columns: "",
@@ -180,6 +170,80 @@ export default {
         )}.png`);
       }
       return url;
+    },
+    collectAdater(theCollect) {
+      if (!theCollect) return;
+      const { Cid, Eid } = theCollect;
+      const { Avatar, PortraitUrl, UserId, Time } = theCollect;
+
+      let collect = {
+        Key: theCollect.Id,
+        Name: theCollect.Name || "",
+        UserAccount: UserId || "",
+        AvatarUrl: Avatar
+          ? "data:image/jpeg;base64" + Avatar
+          : PortraitUrl
+          ? PortraitUrl
+          : this.makeAvatar({}),
+        Time: moment(Time)
+          .utcOffset(0)
+          .format("YYYY-HH-MM HH:mm:ss"),
+        Raw: theCollect,
+        items: []
+      };
+
+      if (_.get(theCollect, "ResInfos.length")) {
+        for (let res of theCollect.ResInfos) {
+          let collectItem = { MsgType: res.Type, Urls: [] };
+          collect.items.push(collectItem);
+
+          switch (res.Type) {
+            case "image":
+            case "video":
+            case "audio":
+              for (const key of MEDIAPATH_KEYSMAP) {
+                const urlPath = _.get(res, key);
+                if (urlPath) {
+                  const curSrc = this.buildPreviewUrl({
+                    cid: Cid,
+                    eid: Eid,
+                    filePath: urlPath,
+                    isStatic: key === "StaticPaths[0]",
+                    isFullUrl: key === "Urls[0]" ? urlPath : false
+                  });
+                  collectItem.Urls.push(curSrc);
+                }
+              }
+
+              break;
+            case "web":
+              collectItem.Title = res.Title || res.Summary;
+              collectItem.Icon = res.PicUrl;
+              collectItem.Url = _.get(res, "Urls[0]") || "";
+              break;
+            case "file":
+              collectItem.Name = res.Content || res.Title;
+              collectItem.Url = this.buildPreviewUrl({
+                cid: Cid,
+                eid: Eid,
+                filePath: _.get(res, "LocalPaths[0]") || "",
+                isStatic: false
+              });
+              break;
+            case "map":
+              collectItem.Title = res.TitleS;
+              collectItem.Summary = res.Summary;
+              // collectItem.Url = _.get(res, "Urls[0]") || "";
+              break;
+            default:
+              collectItem.Type = "text";
+              collectItem.Text =
+                res.Content || res.Summary || theCollect.Content;
+              break;
+          }
+        }
+      }
+      return collect;
     },
     messageAdapter(message) {
       const { Cid, Eid } = message;
@@ -296,9 +360,9 @@ export default {
     }
   },
   created() {
-    this.throttleFunc = lodash
-      .throttle(this.loadMoreMessages, 500, { leading: true })
-      .bind(this);
+    this.throttleFunc = _.throttle(this.loadMoreMessages, 500, {
+      leading: true
+    }).bind(this);
   },
   mounted() {
     const scrollWraper = document.getElementById("scroll2load");
