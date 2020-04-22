@@ -24,15 +24,30 @@
                 :key="index"
                 :collect="collect"
                 @collectClick="
-                  (collectItem, event) =>
-                    collectClick(collect, collectItem, event)
+                  (collectItem, event) => collectClick(collect, item, event)
                 "
               ></collect-body>
+            </template>
+            <template v-if="item.LikeNames || item.Comments">
+              <div class="collect-status">
+                <span>
+                  <i class="iconfont iconlike"></i>({{ item.LikeNames.length }})
+                </span>
+                <i class="iconfont iconicon_message"></i>({{
+                  item.Comments.length
+                }})
+              </div>
+            </template>
+            <template v-if="item.Comments">
+              <div class="collect-comments">
+                <template v-for="(comment, index) in item.Comments">
+                  <div :key="index">{{ comment }}</div>
+                </template>
+              </div>
             </template>
           </div>
         </div>
       </div>
-      <!-- {{ item.items }} -->
     </div>
   </div>
 </template>
@@ -66,8 +81,8 @@ export default {
     }
   },
   methods: {
-    collectClick(collect, event) {
-      console.log("collectionClick", collect, event);
+    collectClick(collect, collectItem, event) {
+      console.log("collectionClick", collect, collectItem, event);
     }
   }
 };
@@ -112,6 +127,11 @@ export default {
               z-index: 10;
             }
           }
+        }
+        .collect-status {
+          text-align: left;
+        }
+        .collect-comments {
         }
       }
     }

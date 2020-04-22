@@ -1,6 +1,6 @@
 <template>
   <div class="collect-body" @click="emitClick">
-    <template v-if="collect.MsgType === 'text'">
+    <template v-if="collect.Text">
       <div class="text" v-html="collect.Text"></div>
     </template>
     <template v-if="collect.MsgType === 'image'">
@@ -102,10 +102,13 @@ export default {
 .collect-body {
   text-align: left;
   .text {
+    white-space: pre-wrap;
     text-align: left;
   }
   .image {
+    max-width: 350px;
     img {
+      margin-right: 10px;
       max-height: 100px;
     }
   }

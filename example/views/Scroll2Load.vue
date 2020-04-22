@@ -42,8 +42,14 @@ import moment from "moment";
 import collection from "components/messagebody/collection";
 import conversation from "components/messagebody/conversation.vue";
 
-const MEDIAPATH_KEYSMAP = ["StaticPaths[0]", "LocalPaths[0]", "Urls[0]"];
-const MEDIAPATH_SORTED = ["StaticPath", "ThumbPath", "RawPath", "Url"];
+const MEDIAPATH_SORTED = [
+  "StaticPath",
+  "ThumbPath",
+  "LocalPaths",
+  "RawPath",
+  "Urls",
+  "Url"
+];
 const PREPARED_MESSAGE_TYPE = [
   "systemmsg",
   "image",
@@ -86,9 +92,10 @@ export default {
   data() {
     return {
       currentPage: 1,
-      limit: 10,
+      limit: 20,
       totalCount: 0,
       messages: [],
+      datatype: "imsnsinfo",
       throttleFunc: null
     };
   },
@@ -106,13 +113,13 @@ export default {
           .getData({
             //火眼
             cid: 1,
-            eid: 14,
-            pid: 358000549,
+            eid: 1,
+            pid: 26000400,
             skip: (this.currentPage - 1) * this.limit,
             limit: this.limit,
             userid: 1,
-            datatype: "imfavinfo",
-            category: "favoritenode",
+            datatype: this.datatype,
+            category: "wechatmoment",
             keyword: "",
             oncolumns: "",
             desc: false,
@@ -188,41 +195,73 @@ export default {
         Time: moment(Time)
           .utcOffset(0)
           .format("YYYY-HH-MM HH:mm:ss"),
+        Deleted: theCollect.Delete == 2,
         Raw: theCollect,
+        // Text:
         items: []
       };
-
+      //点赞人
+      if (theCollect.LikeInfo) {
+        collect.LikeNames = [];
+        for (let person of theCollect.LikeInfo) {
+          collect.LikeNames.push(person.Name);
+        }
+      }
+      //评论
+      if (_.get(theCollect, "Comments.length")) {
+        collect.Comments = [];
+        for (let comment of theCollect.Comments) {
+          collect.Comments.push({
+            Author: comment.Name,
+            Target: comment.ReplyToName,
+            Content: comment.Content,
+            Time: comment.Time
+          });
+        }
+      }
       if (_.get(theCollect, "ResInfos.length")) {
+        let collectText = theCollect.Content;
         for (let res of theCollect.ResInfos) {
           let collectItem = { MsgType: res.Type, Urls: [] };
           collect.items.push(collectItem);
 
+          if (res.Content || res.Summary) {
+            collectText = res.Content || res.Summary;
+          }
           switch (res.Type) {
             case "image":
             case "video":
             case "audio":
-              for (const key of MEDIAPATH_KEYSMAP) {
-                const urlPath = _.get(res, key);
-                if (urlPath) {
-                  const curSrc = this.buildPreviewUrl({
-                    cid: Cid,
-                    eid: Eid,
-                    filePath: urlPath,
-                    isStatic: key === "StaticPaths[0]",
-                    isFullUrl: key === "Urls[0]" ? urlPath : false
+              MEDIAPATH_SORTED.forEach(item => {
+                if (_.get(res, `${item}.length`)) {
+                  res[item].forEach(path => {
+                    if (!path) return;
+                    if (item.includes("Url")) {
+                      collectItem.Urls.push(path);
+                    } else {
+                      collectItem.Urls.push(
+                        this.buildPreviewUrl({
+                          cid: Cid,
+                          eid: Eid,
+                          filePath: path,
+                          isStatic: item === "StaticPaths"
+                        })
+                      );
+                    }
                   });
-                  collectItem.Urls.push(curSrc);
                 }
-              }
+              });
 
               break;
             case "web":
               collectItem.Title = res.Title || res.Summary;
+              if (collectItem.Title === collectText) collectText = "";
               collectItem.Icon = res.PicUrl;
               collectItem.Url = _.get(res, "Urls[0]") || "";
               break;
             case "file":
               collectItem.Name = res.Content || res.Title;
+              if (collectItem.Name === collectText) collectText = "";
               collectItem.Url = this.buildPreviewUrl({
                 cid: Cid,
                 eid: Eid,
@@ -235,12 +274,10 @@ export default {
               collectItem.Summary = res.Summary;
               // collectItem.Url = _.get(res, "Urls[0]") || "";
               break;
-            default:
-              collectItem.Type = "text";
-              collectItem.Text =
-                res.Content || res.Summary || theCollect.Content;
-              break;
           }
+        }
+        if (collectText) {
+          collect.items.unshift({ Type: "text", Text: collectText });
         }
       }
       return collect;
