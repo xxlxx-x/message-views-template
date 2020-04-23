@@ -5,7 +5,7 @@
       v-for="(item, index) in parsedCollects"
       :key="`${item.Key}_${index}`"
     >
-      <div class="main">
+      <div class="main" @click="event => collectClick(null, item, event)">
         <img class="avatar" :src="item.AvatarUrl" />
         <!-- @click="event => messageClick(item, event)" -->
         <div class="main-content">
@@ -28,20 +28,45 @@
                 "
               ></collect-body>
             </template>
-            <template v-if="item.LikeNames || item.Comments">
+            <p class="collect-time">{{ item.Time }}</p>
+            <template v-if="item.Counts.length">
               <div class="collect-status">
-                <span>
-                  <i class="iconfont iconlike"></i>({{ item.LikeNames.length }})
-                </span>
-                <i class="iconfont iconicon_message"></i>({{
-                  item.Comments.length
-                }})
+                <template v-for="(Counter, index) in item.Counts">
+                  <span :key="index" title="Counter.Title">
+                    <i :class="['iconfont', Counter.Icon]"></i>
+                    ({{ Counter.Value }})
+                  </span>
+                </template>
+                <template v-if="item.LikeNames">
+                  <div class="like-names">
+                    <i class="iconfont iconlike"></i>
+                    <span
+                      v-for="(Name, index) in item.LikeNames"
+                      :key="`name_${index}`"
+                      >{{ Name
+                      }}<span v-if="index + 1 < item.LikeNames.length"
+                        >,</span
+                      ></span
+                    >
+                  </div>
+                </template>
               </div>
             </template>
             <template v-if="item.Comments">
               <div class="collect-comments">
-                <template v-for="(comment, index) in item.Comments">
-                  <div :key="index">{{ comment }}</div>
+                <template
+                  v-for="({ Author, Target, Content, Time },
+                  index) in item.Comments"
+                >
+                  <div :key="index" class="comment-item">
+                    <span class="name"> {{ Author }} </span>
+                    <span v-if="Author !== Target">
+                      回复
+                      <span class="name">{{ Target }} </span>:</span
+                    >
+                    <span class="time">({{ Time }})</span>
+                    <div class="content">{{ Content }}</div>
+                  </div>
                 </template>
               </div>
             </template>
@@ -128,10 +153,37 @@ export default {
             }
           }
         }
+        .collect-time {
+          text-align: left;
+          color: rgb(58, 120, 255);
+        }
         .collect-status {
           text-align: left;
+          margin-bottom: 10px;
+          .like-names {
+            font-size: 14px;
+            i {
+              margin-right: 5px;
+            }
+            span {
+              // padding-left: 5px;
+              color: rgb(58, 120, 255);
+            }
+          }
         }
         .collect-comments {
+          text-align: left;
+          font-size: 14px;
+
+          .comment-item {
+            span.name {
+              color: rgb(58, 120, 255);
+            }
+          }
+          .content {
+            white-space: pre-wrap;
+            margin: 0 0 10px;
+          }
         }
       }
     }

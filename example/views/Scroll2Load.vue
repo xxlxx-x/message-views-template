@@ -69,7 +69,12 @@ const TRANSFORM_TYPE = {
   transferacount: "transfer",
   qqzone: "web"
 };
-
+const BLOG_PERSONS_COUNTS = [
+  { Icon: "iconicon_share", Title: "转发", Key: "RtCount" },
+  { Icon: "iconicon_message", Title: "评论", Key: "CommentCount" },
+  { Icon: "iconlike", Title: "点赞", Key: "LikeCount" },
+  { Icon: "iconicon_star", Title: "收藏", Key: "StarCount" }
+];
 export const jp = str => {
   let obj = {};
   if (str) {
@@ -200,6 +205,19 @@ export default {
         // Text:
         items: []
       };
+      // 转发 评论 点赞 收藏 计数
+      collect.Counts = [];
+      BLOG_PERSONS_COUNTS.forEach(item => {
+        const { Key } = item;
+        let Counter = {
+          ...item,
+          Value: 0
+        };
+        if (theCollect[Key]) {
+          Counter.Value = theCollect[Key];
+          collect.Counts.push(Counter);
+        }
+      });
       //点赞人
       if (theCollect.LikeInfo) {
         collect.LikeNames = [];
@@ -215,7 +233,9 @@ export default {
             Author: comment.Name,
             Target: comment.ReplyToName,
             Content: comment.Content,
-            Time: comment.Time
+            Time: moment(comment.Time)
+              .utcOffset(0)
+              .format("YYYY-HH-MM HH:mm:ss")
           });
         }
       }
