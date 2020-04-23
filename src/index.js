@@ -1,16 +1,18 @@
-import Test from "./components/Test.vue";
+import conversation from "./components/messagebody/conversation.vue";
+import messagebody from "./components/messagebody/messagebody.vue";
+import collection from "./components/messagebody/collection.vue";
+import collectbody from "./components/messagebody/collectbody.vue";
 
-// Install the components
+import packge from "../package.json";
+
 export function install(Vue) {
-  Vue.component("test", Test);
-  /* -- Add more components here -- */
+  Vue.component("conversation", conversation);
+  Vue.component("messagebody", messagebody);
+  Vue.component("collection", collection);
+  Vue.component("collectbody", collectbody);
 }
 
-// Expose the components
-export {
-  Test
-  /* -- Add more components here -- */
-};
+export { conversation, messagebody, collection, collectbody };
 
 /* -- Plugin definition & Auto-install -- */
 /* You shouldn't have to modify the code below */
@@ -18,7 +20,7 @@ export {
 // Plugin
 const plugin = {
   /* eslint-disable no-undef */
-  version: VERSION,
+  version: packge.version,
   install
 };
 
