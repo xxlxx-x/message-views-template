@@ -59,7 +59,7 @@
               @contextmenu="event => $emit('itemContext', { item, event })"
             >
               <div class="relative-wrap">
-                <div class="function-bar">
+                <!-- <div class="function-bar">
                   <div
                     v-if="item.Text && isMessageTranslatable(item.Text)"
                     class="item-flag item-transtale"
@@ -74,7 +74,7 @@
                     </div>
                     <i v-else class="iconfont icontranslate"></i>
                   </div>
-                  <!-- <div
+                  <div
                     v-if="item.MsgType === 'voice' && item.Url !== 'unknown'"
                     class="item-flag item-transtale"
                     @click.stop="() => translateMessage(item)"
@@ -87,11 +87,11 @@
                       <div></div>
                     </div>
                     <i v-else class="iconfont icontranslate"></i>
-                  </div> -->
-                  <!-- <div v-if="item.Selected" class="item-flag item-selected">
+                  </div>
+                  <div v-if="item.Selected" class="item-flag item-selected">
                     <i class="iconfont iconselected"></i>
-                  </div> -->
-                </div>
+                  </div>
+                </div> -->
                 <message-body :message="item" class="message-back" />
               </div>
             </div>
@@ -115,7 +115,7 @@
 
 <script>
 import messagebody from "./messagebody";
-import { isMessageTranslatable } from "utils/util.translate";
+// import { isMessageTranslatable } from "utils/util.translate";
 
 export default {
   name: "ConversationWraper",
@@ -161,7 +161,7 @@ export default {
   },
   // media 媒体类型消息不显示背景
   methods: {
-    isMessageTranslatable,
+    // isMessageTranslatable,
     buildMessages() {
       this.parsedMessages = this.messages.map(message => {
         if (this.adapter) {
