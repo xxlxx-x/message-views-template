@@ -1,32 +1,47 @@
 <template>
-  <div class="collect-body" @click="emitClick">
+  <div class="collect-body">
     <template v-if="collect.Text">
-      <div class="text" v-html="collect.Text"></div>
+      <div class="text" v-html="collect.Text" />
+      <!-- #{{ collect.MsgType }}# -->
     </template>
     <template v-if="collect.MsgType === 'image'">
       <div class="image">
         <template v-for="(Url, index) in collect.Urls">
-          <img :src="Url" :key="index" />
+          <img
+            :src="Url"
+            :key="index"
+            @click="
+              event =>
+                root.$emit('viewClick', {
+                  url: Url,
+                  item: collect,
+                  event
+                })
+            "
+          />
         </template>
       </div>
     </template>
     <template v-if="collect.MsgType === 'audio'">
       <div class="voice">
         <template v-for="(Url, index) in collect.Urls">
-          <audio :src="Url" :key="index" controls></audio>
+          <audio :src="Url" :key="index" controls />
         </template>
       </div>
     </template>
     <template v-if="collect.MsgType === 'video'">
       <div class="video">
         <template v-for="(Url, index) in collect.Urls">
-          <video :src="Url" :key="index" controls></video>
+          <video :src="Url" :key="index" controls />
         </template>
       </div>
     </template>
     <template v-if="collect.MsgType === 'file'">
       <div class="file">
-        <a :href="collect.Url">{{ collect.Name }}</a>
+        <p v-if="collect.Url" class="file-link" target="blank">
+          {{ collect.Name }}
+        </p>
+        <p v-else>{{ collect.Name }}</p>
       </div>
     </template>
     <template v-if="collect.MsgType === 'map'">
@@ -57,22 +72,33 @@
       <div class="web">
         <div class="web1">
           <div class="web1-desc">
-            <a
+            <p
               v-if="collect.Url"
-              :href="collect.Url"
               class="web-title"
-              target="blank"
-              >{{ collect.Title }}</a
+              @click.stop="
+                event => {
+                  root.$emit('clickLink', { item: collect, event });
+                }
+              "
             >
-            <span v-else class="web-title">{{ collect.Title }}</span>
-            <h5>{{ collect.Summary }}</h5>
+              {{ collect.Title }}
+            </p>
+            <span v-else>{{ collect.Title }}</span>
+            <div
+              class="web-content"
+              @click="
+                event => {
+                  root.$emit('clickLink', { item: collect, event });
+                }
+              "
+            >
+              <img v-if="collect.Icon" :src="collect.Icon" />
+              {{ collect.Summary }}
+            </div>
           </div>
           <div v-if="collect.PictureUrl" class="web1-img-content">
-            <img class="web1-img" :src="collect.PictureUrl" />
+            <img :src="collect.PictureUrl" class="web1-img" />
           </div>
-        </div>
-        <div class="desc">
-          {{ collect.Content }}
         </div>
       </div>
     </template>
@@ -82,17 +108,12 @@
 
 <script>
 export default {
-  name: "collect-body",
-
+  name: "CollectBody",
+  inject: ["root"],
   props: {
     collect: {
       type: Object,
       default: () => {}
-    }
-  },
-  methods: {
-    emitClick(event) {
-      this.$emit("collectClick", this.collect, event);
     }
   }
 };
@@ -102,14 +123,19 @@ export default {
 .collect-body {
   text-align: left;
   .text {
+    font-size: 1rem;
     white-space: pre-wrap;
     text-align: left;
+    margin-bottom: 5px;
   }
   .image {
     max-width: 350px;
     img {
-      margin-right: 10px;
-      max-height: 100px;
+      width: 100px;
+      height: 100px;
+      object-fit: scale-down;
+      background-color: rgb(209, 209, 209);
+      margin-right: 5px;
     }
   }
   .video {
@@ -118,7 +144,30 @@ export default {
       max-height: 300px;
     }
   }
+  .file {
+    .file-link {
+      color: rgb(74, 122, 255);
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 400;
+    }
+  }
+  .map {
+    display: flex;
+    padding: 10px;
+    background-color: rgb(212, 212, 212);
 
+    .map-img {
+      width: 50px;
+      height: 50px;
+      margin-right: 10px;
+    }
+
+    .map-desc {
+      text-align: left;
+      max-width: 250px;
+    }
+  }
   .web {
     .web1 {
       margin-bottom: 5px;
@@ -134,13 +183,16 @@ export default {
         }
       }
       .web1-desc {
-        a {
+        padding: 10px;
+        background-color: rgba(212, 212, 212, 0.5);
+        .web-title {
+          color: rgb(74, 122, 255);
+          cursor: pointer;
           font-size: 16px;
           font-weight: 400;
         }
-
-        h5 {
-          font-weight: 400;
+        .web-content {
+          max-width: 400px;
         }
       }
     }

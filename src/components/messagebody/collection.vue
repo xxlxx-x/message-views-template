@@ -1,12 +1,18 @@
 <template>
   <div id="collections">
     <div
-      class="item"
       v-for="(item, index) in parsedCollects"
       :key="`${item.Key}_${index}`"
+      class="item"
+      @click="event => collectClick(item, event)"
+      @contextmenu="event => collectContexted(item, event)"
     >
-      <div class="main" @click="event => collectClick(null, item, event)">
-        <img class="avatar" :src="item.AvatarUrl" />
+      <div class="main">
+        <img
+          :src="item.AvatarUrl"
+          :title="`第${item.DatatableIndex}条`"
+          class="avatar"
+        />
         <!-- @click="event => messageClick(item, event)" -->
         <div class="main-content">
           <div class="name-wrapper">
@@ -18,21 +24,26 @@
               </template>
             </div>
           </div>
-          <div class="collect-content">
+          <div
+            class="collect-content"
+            @contextmenu="event => $emit('itemContext', { item, event })"
+          >
+            <div v-if="item.Selected" class="item-selected">
+              <i class="iconfont iconselected"></i>
+            </div>
+            <div class="text">{{ item.Content }}</div>
             <template v-for="(collect, index) in item.items">
-              <collect-body
-                :key="index"
-                :collect="collect"
-                @collectClick="
-                  (collectItem, event) => collectClick(collect, item, event)
-                "
-              ></collect-body>
+              <collect-body :key="index" :collect="collect"></collect-body>
             </template>
+            <p v-if="item.LocationName" class="location-name">
+              <i class="iconfont iconditu2"></i>
+              {{ item.LocationName }}
+            </p>
             <p class="collect-time">{{ item.Time }}</p>
             <template v-if="item.Counts.length">
               <div class="collect-status">
                 <template v-for="(Counter, index) in item.Counts">
-                  <span :key="index" title="Counter.Title">
+                  <span :key="index" :title="Counter.Title">
                     <i :class="['iconfont', Counter.Icon]"></i>
                     ({{ Counter.Value }})
                   </span>
@@ -43,11 +54,10 @@
                     <span
                       v-for="(Name, index) in item.LikeNames"
                       :key="`name_${index}`"
-                      >{{ Name
-                      }}<span v-if="index + 1 < item.LikeNames.length"
-                        >,</span
-                      ></span
                     >
+                      {{ Name }}
+                      <span v-if="index + 1 < item.LikeNames.length"> , </span>
+                    </span>
                   </div>
                 </template>
               </div>
@@ -78,12 +88,17 @@
 </template>
 
 <script>
-import collectbody from "components/messagebody/collectbody";
+import collectbody from "./collectbody";
 
 export default {
   name: "collections",
   components: {
     "collect-body": collectbody
+  },
+  provide() {
+    return {
+      root: this
+    };
   },
   props: {
     collections: {
@@ -95,19 +110,42 @@ export default {
       default: null
     }
   },
-  computed: {
-    parsedCollects() {
-      return this.collections.map(collect => {
+  data() {
+    return { parsedCollects: [] };
+  },
+  // computed: {
+  //   parsedCollects() {
+  //     return this.collections.map(collect => {
+  //       if (this.adapter) {
+  //         return this.adapter(collect);
+  //       }
+  //       return collect;
+  //     });
+  //   }
+  // },
+
+  watch: {
+    collections() {
+      this.buildCollections();
+    }
+  },
+  created() {
+    this.buildCollections();
+  },
+  methods: {
+    buildCollections() {
+      this.parsedCollects = this.collections.map(collect => {
         if (this.adapter) {
           return this.adapter(collect);
         }
         return collect;
       });
-    }
-  },
-  methods: {
-    collectClick(collect, collectItem, event) {
-      console.log("collectionClick", collect, collectItem, event);
+    },
+    collectClick(collect, event) {
+      this.$emit("viewClick", { item: collect, event });
+    },
+    collectContexted(item, event) {
+      this.$emit("collectContext", item, event);
     }
   }
 };
@@ -120,11 +158,15 @@ export default {
     margin-bottom: 20px;
     .main {
       display: flex;
+      position: relative;
       padding: 5px 20px;
+
       &:hover {
         background-color: rgba(228, 228, 228, 0.5);
       }
-
+      &:hover .delete-image {
+        opacity: 0.2;
+      }
       .avatar {
         margin-top: 5px;
         width: 50px;
@@ -142,14 +184,31 @@ export default {
 
           .name {
             font-size: 14px;
-            position: relative;
             white-space: nowrap;
+            position: relative;
 
             .delete-image {
               position: absolute;
               top: -10px;
               right: 0;
-              z-index: 10;
+              z-index: 2;
+            }
+          }
+        }
+        .collect-content {
+          font-size: 1rem;
+          position: relative;
+          .location-name {
+            color: rgb(58, 120, 255);
+          }
+          .item-selected {
+            color: red;
+            position: absolute;
+            top: 0px;
+            right: -45px;
+            // padding: 0 10px;
+            i {
+              font-size: 40px;
             }
           }
         }
